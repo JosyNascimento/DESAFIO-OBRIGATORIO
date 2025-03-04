@@ -11,6 +11,9 @@ const {
 
 const router = express.Router();
 
+router.get('/registro', (req, res) => {
+    res.render('registro');
+  });
 router.post('/register', registerUser);
 
 router.get('/perfil', (req, res, next) => {
