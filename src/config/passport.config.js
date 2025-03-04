@@ -1,3 +1,5 @@
+//passport.config.js
+
 const passport = require('passport');
 const local = require('passport-local');
 const GitHubStrategy = require('passport-github2').Strategy;
@@ -43,30 +45,57 @@ const initializePassport = () => {
     }
   }));
 
-  passport.use('github', new GitHubStrategy({
+
+  passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: 'http://localhost:8080/githubcallback',
-  }, async (accessToken, refreshToken, profile, done) => {
+    callbackURL: "http://localhost:8080/githubcallback",
+    scope: ['user:email']
+  },
+  async (accessToken, refreshToken, profile, done) => {
     try {
-      console.log(profile);
-      let user = await User.findOne({ email: profile._json.email });
-      if (!user) {
-        let newUser = {
-          first_name: profile._json.name.split(' ')[0],
-          last_name: profile._json.name.split(' ')[1],
-          email: profile._json.email,
-          password: "",
-        };
-        let result = await User.create(newUser);
-        return done(null, result);
-      }
-      return done(null, user);
-    } catch (error) {
-      return done(`Erro ao autenticar usuário: ${error}`);
-    }
-  }));
+        console.log("GitHub Profile:", profile);  // Verifica os dados retornados
+        console.log("Access Token:", accessToken); // Verifica o token recebido
 
+        let email = null;
+
+        // Verifica se o perfil já contém emails
+        if (profile.emails && profile.emails.length > 0) {
+            email = profile.emails[0].value;
+        } else {
+            // Busca manualmente os emails, caso não tenham sido enviados no perfil
+            console.log("Tentando buscar email manualmente...");
+            const emailResponse = await axios.get('https://api.github.com/user/emails', {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+
+            console.log("Resposta dos emails:", emailResponse.data);
+
+            const primaryEmail = emailResponse.data.find(e => e.primary && e.verified);
+            if (primaryEmail) {
+                email = primaryEmail.email;
+            }
+        }
+
+        console.log("Email do usuário:", email);
+
+        let user = await User.findOne({ githubId: profile.id });
+
+        if (!user) {
+            user = await User.create({
+                githubId: profile.id,
+                name: profile.displayName || profile.username,
+                email: email || null, // Evita erro caso não tenha email
+                password: null
+            });
+        }
+
+        return done(null, user);
+    } catch (error) {
+        console.error("Erro ao autenticar com GitHub:", error.response ? error.response.data : error.message);
+        return done(error);
+    }
+}));
   passport.use('login', new localStrategy({ usernameField: 'email', passwordField: 'password' }, async (username, password, done) => {
     try {
       let user = await User.findOne({ email: username });

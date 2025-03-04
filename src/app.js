@@ -40,6 +40,7 @@ const io = new Server(server);
 // Conexão com o MongoDB
 connectDB(process.env.MONGO_URL);
 
+
 // Configuração do Handlebars
 app.engine("handlebars", handlebars.engine());
 

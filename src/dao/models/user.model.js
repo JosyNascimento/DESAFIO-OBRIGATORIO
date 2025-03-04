@@ -2,35 +2,12 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const userCollection = "users"; // Definindo o nome da coleção
 
 const userSchema = new mongoose.Schema({
-  first_name: {
-    type: String,
-    required: true
-  },
-  last_name: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  role: {
-    type: String,
-    enum: ['admin', 'user'],
-    default: 'user'
-  },
-  avatar: { 
-    type: String, 
-    default: '/public/img/gustavo.jpeg' // Caminho para a imagem padrão
-  }
+  githubId: { type: String, unique: true, sparse: true }, // Adiciona um campo para GitHub ID
+  name: { type: String, required: true },
+  email: { type: String, required: false }, // Tornar o email opcional
+  password: { type: String, required: false } //  Tornar a senha opcional
 });
 
 // Método para criptografar a senha antes de salvar

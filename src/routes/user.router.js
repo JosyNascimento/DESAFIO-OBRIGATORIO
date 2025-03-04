@@ -5,6 +5,7 @@ const { autenticacao } = require('../middlewares/auth.middleware');
 const { createHash } = require('../utils/password');
 const passport = require('passport');
 
+
 const ADMIN_EMAIL = 'adminCoder@coder.com'; // Definindo o e-mail do admin
 
 console.log("Iniciando o user.router.js");
@@ -44,8 +45,8 @@ router.post('/register', async (req, res, next) => {
 
 // Rota para perfil do usuário
 router.get('/perfil', autenticacao, (req, res) => {
-  const { first_name, last_name, email, age } = req.session.user;
-  res.render('perfil', { first_name, last_name, email, age });
+  const { first_name, last_name, email } = req.session.user;
+  res.render('perfil', { first_name, last_name, email});
 });
 
 // Rota para resetar senha

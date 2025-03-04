@@ -2,6 +2,10 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 
+
+// Importa o módulo passportCall
+const passportCall = require('../utils/passport');
+
 router.use((req, res, next) => {
     if (req.session.user) {
         res.locals.user = req.session.user;
@@ -11,13 +15,18 @@ router.use((req, res, next) => {
 
 router.get('/login', (req, res) => {
     res.render('login');
-});
+  });
+  
+
+router.get('/login/github', 
+    passportCall('github'), 
+);
 
 router.get('/github', passport.authenticate('github', scope = ['user:email']), (req, res) => {
     console.log(req.session);
 }); 
 
-router.get('githubcallback', passport.authenticate('github', { failureRedirect: '/login' }), (req, res) => {
+router.get('/githubcallback', passport.authenticate('github', { failureRedirect: '/login' }), (req, res) => {
     req.session.user = req.user; // Salva o usuário na sessão
     res.redirect('/perfil'); // Redireciona para a página de perfil
 });
