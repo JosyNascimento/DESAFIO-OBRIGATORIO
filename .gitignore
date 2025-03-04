@@ -1,9 +1,19 @@
+# Ignorar a pasta node_modules (bibliotecas do projeto)
 node_modules/
+
+# Ignorar pacotes comprimidos (.tgz)
 .tgz
+
+# Ignorar arquivos .env (variáveis de ambiente)
 .env
 .env.development.local
 .env.test.local
 .env.production.local
 .env.local
+
+# Ignorar arquivos de cache
 .cache
 .parcel-cache
+
+# Ignorar o arquivo de teste
+.teste.js
