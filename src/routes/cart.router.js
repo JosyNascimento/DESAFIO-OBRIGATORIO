@@ -17,4 +17,8 @@ router.put("/:cid/products/:pid", updateCartProductQuantity);
 router.get("/", displayCart);
 router.delete("/:cid", clearCart);
 
+<<<<<<< Updated upstream
 module.exports = router;
+=======
+module.exports = router;
+>>>>>>> Stashed changes

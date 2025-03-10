@@ -6,8 +6,6 @@ const renderLoginPage = (req, res) => {
   res.render("login");
 };
 
-const githubAuth = passport.authenticate("github", { scope: ["user:email"] });
-
 const githubCallback = passport.authenticate("github", {
   failureRedirect: "/login",
   successRedirect: "/perfil", // Correção: redirecionamento direto para /perfil
@@ -62,7 +60,6 @@ const logoutUser = (req, res) => {
 
 module.exports = {
   renderLoginPage,
-  githubAuth,
   githubCallback,
   handleGithubCallback,
   loginUser,

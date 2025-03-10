@@ -51,4 +51,8 @@ module.exports = {
   renderRegisterPage,
   renderUpdateUserPage,
   renderProductsPage,
+<<<<<<< Updated upstream
 };
+=======
+};
+>>>>>>> Stashed changes
