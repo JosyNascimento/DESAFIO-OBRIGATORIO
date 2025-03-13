@@ -89,8 +89,4 @@ module.exports = { listProducts,
   getAllProducts,
   addProduct,
   deleteProduct,
-<<<<<<< Updated upstream
 };
-=======
-};
->>>>>>> Stashed changes

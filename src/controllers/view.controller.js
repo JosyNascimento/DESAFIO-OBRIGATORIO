@@ -1,58 +1,76 @@
-const userModel = require("../dao/models/user.model");
+// src/controllers/view.controller.js
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const passport = require('passport');
+const User = require('../dao/models/user.model');
+
+const register = async (req, res, next) => {
+    try {
+        const newUser = await User.create(req.body);
+        res.status(201).json({ message: "Usuário criado com sucesso", user: newUser });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const handleGithubCallback = (req, res) => {
+    req.session.user = req.user;
+    res.redirect("/perfil");
+};
+
+const failLogin = (req, res) => {
+    res.status(401).json({ message: "Usuário ou senha inválidos" });
+};
+
+const logoutUser = (req, res) => {
+    req.session.destroy((err) => {
+        if (!err) {
+            res.redirect("/login");
+        } else {
+            res.status(500).json({ message: "Erro no logout", error: err });
+        }
+    });
+};
+
 
 const renderHomePage = (req, res) => {
-  res.render("home", { title: "Página Inicial", products: [] });
+    res.render('home');
 };
 
-const renderUserList = async (req, res) => {
-  console.log("na rota list");
-  try {
-    let users = await userModel.find();
-    users = users.map((user) => user.toJSON());
-    return res.render("users", { users });
-  } catch (error) {
-    return res.render("error", { error: error.message });
-  }
+const renderLogin = (req, res) => {
+    res.render('login');
 };
 
-const renderRegisterPage = (req, res) => {
-  res.render("register");
+const renderRegister = (req, res) => {
+    res.render('register');
 };
 
-const renderUpdateUserPage = async (req, res) => {
-  try {
-    const { id } = req.params;
-    let user = await userModel.findById(id);
-    user = user.toJSON();
-    return res.render("update", { user });
-  } catch (error) {
-    return res.render("error", { error: error.message });
-  }
+const renderProducts = (req, res) => {
+    res.render('products');
 };
 
-const renderProductsPage = (req, res) => {
-  if (!req.session.user) {
-    return res.redirect("/login");
-  }
+const renderCarts = (req, res) => {
+    res.render('cart');
+};
 
-  const role = req.session.user.role;
-  const username = req.session.user.email;
+const renderProfile = (req, res) => {
+    res.render('profile');
+};
 
-  res.render("products", {
-    username,
-    role,
-    welcomeMessage: role === "admin" ? `Bem-vindo, Admin ${username}!` : `Bem-vindo, ${username}!`,
-  });
+const renderchat = (req, res) => {
+    res.render('chat');
 };
 
 module.exports = {
-  renderHomePage,
-  renderUserList,
-  renderRegisterPage,
-  renderUpdateUserPage,
-  renderProductsPage,
-<<<<<<< Updated upstream
+    register,
+    handleGithubCallback,
+    failLogin,
+    logoutUser,
+    renderHomePage,
+    renderLogin,
+    renderRegister,
+    renderProducts,
+    renderCarts,
+    renderProfile,
+    renderchat
 };
-=======
-};
->>>>>>> Stashed changes

@@ -1,3 +1,4 @@
+// src/controllers/User.controller.js
 const User = require('../dao/models/user.model');
 const { createHash } = require('../utils/password');
 
@@ -7,7 +8,7 @@ const registerUser = async (req, res) => {
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).send('E-mail já cadastrado');
+            return res.status(400).json({ message: 'E-mail já cadastrado' });
         }
 
         const hashedPassword = createHash(password);
@@ -24,36 +25,34 @@ const registerUser = async (req, res) => {
         return res.status(201).json({ message: "Usuário cadastrado com sucesso", user: newUser });
     } catch (error) {
         console.error("Erro ao registrar usuário:", error);
-        return res.status(500).json({ message: "Erro no servidor" });
+        return res.status(500).json({ message: "Erro no servidor", error: error.message });
     }
 };
+
 const getUserProfile = (req, res) => {
-  if (req.session.user) {
-      console.log(req.session.user); // Verifique os dados na sessão
+    if (req.session.user) {
+        console.log(req.session.user); // Verifique os dados na sessão
 
-      let user = {};
+        let user = {};
 
-      // Se o usuário estiver logado via GitHub
-      if (req.session.user.provider === 'github') {
-          user = {
-              username: req.session.user.username,
-              email: req.session.user.email,
-              // Outros dados do perfil do GitHub
-          };
-      } else {
-          // Se o usuário estiver logado com senha e email
-          user = {
-              first_name: req.session.user.first_name,
-              last_name: req.session.user.last_name,
-              email: req.session.user.email,
-              // Outros dados do usuário
-          };
-      }
-      res.render('perfil', { ...user }); // Passa as propriedades do usuário para a view
-  } else {
-      res.redirect('/login'); // Redireciona para login se não estiver autenticado
-  }
+        if (req.session.user.provider === 'github') {
+            user = {
+                username: req.session.user.username,
+                email: req.session.user.email,
+            };
+        } else {
+            user = {
+                first_name: req.session.user.first_name,
+                last_name: req.session.user.last_name,
+                email: req.session.user.email,
+            };
+        }
+        res.render('perfil', { ...user });
+    } else {
+        res.redirect('/login');
+    }
 };
+
 const renderResetPasswordPage = (req, res) => {
     res.render('reset-password');
 };
@@ -79,7 +78,7 @@ const listUsers = async (req, res) => {
         });
     } catch (error) {
         console.error('Erro ao buscar usuários:', error);
-        res.status(500).send('Erro ao buscar usuários');
+        res.status(500).send(`Erro ao buscar usuários: ${error.message}`);
     }
 };
 

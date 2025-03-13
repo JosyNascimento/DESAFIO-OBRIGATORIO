@@ -1,33 +1,15 @@
+// Desafio10-ReestruturaçãodoServidor/src/routes/user.router.js
 const express = require('express');
-const passport = require('passport');
-const {
-    registerUser,
-    getUserProfile,
-    renderResetPasswordPage,
-    failResetPassword,
-    resetPassword,
-    listUsers
-} = require('../controllers/user.controller');
+const userController = require('../controllers/user.controller');
 
 const router = express.Router();
 
-router.get('/registro', (req, res) => {
-    res.render('registro');
-  });
-router.post('/register', registerUser);
-
-router.get('/perfil', (req, res, next) => {
-    if (req.session.user) {
-        getUserProfile(req, res, next);
-    } else {
-        // Se a sessão não existir, use o middleware de autenticação (JWT)
-        require('../middlewares/auth.middleware').autenticacao(req, res, next);
-    }
-});
-
-router.get('/reset-password', renderResetPasswordPage);
-router.get('/failreset', failResetPassword);
-router.post("/reset-password", passport.authenticate('reset-password', { failureRedirect: '/failreset', failureMessage: true }), resetPassword);
-router.get('/list', listUsers);
+  router.post('/registro', userController.registerUser);
+  router.post('/register', userController.registerUser);
+  router.get('/perfil', userController.getUserProfile);
+  router.get('/reset-password', userController.renderResetPasswordPage);
+  router.get('/fail-reset-password', userController.failResetPassword);
+  router.post('/reset-password', userController.resetPassword);
+  router.get('/list', userController.listUsers);
 
 module.exports = router;

@@ -1,24 +1,24 @@
-// Desafio10/src/routes/carts.router.js
+//src/routes/carts.router.js
 const express = require("express");
 const router = express.Router();
+
 const {
+   getCartById, 
+   updateQuantity, 
+   removeItem,
   createCart,
-  getCartById,
   addProductToCart,
   updateCartProductQuantity,
-  displayCart,
   clearCart,
 } = require("../controllers/cart.controller");
 
 router.post("/", createCart);
+
 router.get("/:cid", getCartById);
-router.post("/cart", addProductToCart);
+router.post('/update-quantity',  updateQuantity);
+router.post('/remove',  removeItem);
+router.post("/cid.add-product", addProductToCart);
 router.put("/:cid/products/:pid", updateCartProductQuantity);
-router.get("/", displayCart);
 router.delete("/:cid", clearCart);
 
-<<<<<<< Updated upstream
 module.exports = router;
-=======
-module.exports = router;
->>>>>>> Stashed changes

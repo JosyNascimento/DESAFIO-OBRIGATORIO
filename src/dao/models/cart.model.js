@@ -1,7 +1,4 @@
-<<<<<<< Updated upstream
 // Desafio10/src/dao/models/cart.model.js
-=======
->>>>>>> Stashed changes
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
