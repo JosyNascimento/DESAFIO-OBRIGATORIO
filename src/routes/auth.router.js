@@ -14,12 +14,10 @@ router.use((req, res, next) => {
 // Autenticação com GitHub
 router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
 
-// Rota de callback que o GitHub vai chamar após a autenticação
-router.get('/api/sessions/githubcallback', passport.authenticate('github', {
-    successRedirect: '/profile', // Redireciona para a página de perfil após login bem-sucedido
-    failureRedirect: '/login',   // Redireciona para a página de login em caso de falha
+router.get('/githubCallback', passport.authenticate('github', {
+    failureRedirect: '/login',
+    successRedirect: '/perfil'
 }));
-
 
 // Autenticação local (email/senha)
 router.post('/register', authController.register); 

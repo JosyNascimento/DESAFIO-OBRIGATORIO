@@ -3,12 +3,7 @@
         <h1>Perfil do Usuário</h1>
         <h2>Bem-vindo, {{user.name}}!</h2>
         <div class="profile-info">
-            {{#if user.avatar}}
-                <img src="{{user.avatar}}" alt="Foto de perfil" width="100">
-            {{else}}
-                <img src="/images/default-avatar.png" alt="Avatar Padrão" width="100">
-            {{/if}}
-            
+ 
             {{#if user.username}}
                 <p><strong>Nome:</strong> {{ user.username }}</p>
             {{else}}
@@ -17,9 +12,6 @@
 
             <p><strong>E-mail:</strong> {{ user.email }}</p>
 
-            {{#if user.age}}
-                <p><strong>Idade:</strong> {{ user.age }}</p>
-            {{/if}}
         </div>
         <div class="profile-btn-container">
             <a href="/logout" class="logout-btn">Logout</a>
