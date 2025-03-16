@@ -1,88 +1,80 @@
 // Desafio10/src/middlewares/auth.middleware.js
-const jwt = require('jsonwebtoken');
-const User = require('../dao/models/user.model');
 
+console.log("auth.middleware.js carregado");
 
-// Middleware de autorização com base no role
-const authMiddleware = (role) => {
-  return (req, res, next) => {
-      if (!req.user) {
-          return res.status(401).json({ message: "Usuário não autenticado" });
-      }
+const jwt = require('jsonwebtoken'); // Importa a biblioteca jsonwebtoken para lidar com tokens JWT
+const User = require('../dao/models/user.model'); // Importa o modelo User do banco de dados
+const bcrypt = require('bcrypt'); // Importa a biblioteca bcrypt para comparar senhas criptografadas
 
-      if (req.user.role !== role) {
-          return res.status(403).json({ message: "Acesso negado" });
-      }
-
-      next();
-  };
+// Middleware para garantir que o usuário esteja autenticado
+const authMiddleware = (req, res, next) => {
+  if (req.isAuthenticated()) {
+      return next();
+  }
+  res.redirect('/login'); // Redireciona para o login caso não autenticado
 };
 
+
+
+
+// Middleware para verificar se o usuário é um administrador
 const isAdmin = (req, res, next) => {
+  // Verifica se o usuário está autenticado e tem o role "admin"
   if (req.user && req.user.role === 'admin') {
       return next();
   }
   res.status(403).json({ message: 'Acesso negado: apenas administradores' });
 };
 
+// Middleware para verificar se o usuário é um usuário comum
 const isUser = (req, res, next) => {
   if (req.user && req.user.role === 'user') {
       return next();
   }
+  console.log("Acesso negado: apenas usuários");
   res.status(403).json({ message: 'Acesso negado: apenas usuários' });
 };
-const login = async (req, res, next) => {  
-  console.log (req);
-  try {
-      const user = await User.findOne({ username: req.body.username }); 
+// Middleware para realizar o login do usuário
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
 
-      if (!user) {
-          return res.status(400).json({ message: 'Usuário não encontrado' });
-      }
-
-      const isValid = bcrypt.compareSync(req.body.password, user.password);
-      if (!isValid) {
-          return res.status(400).json({ message: 'Senha inválida' });
-      }
-
-      
-      // Gerar o token
-      const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || 'Coder', { expiresIn: '1h' });
-
-      res.json({ message: 'Login bem-sucedido', token });
-  } catch (error) {
-      console.error('Erro ao fazer login:', error);
-      res.status(500).json({ message: 'Erro interno no servidor' });
+  if (!user) {
+      return res.status(400).json({ message: "Usuário não encontrado" });
   }
+
+  const passwordMatch = bcrypt.compareSync(password, user.password);
+  if (!passwordMatch) {
+      return res.status(401).json({ message: "Senha incorreta" });
+  }
+
+  // Gera o token JWT
+  const token = jwt.sign({ id: user._id, email: user.email, role: user.role }, 'SEU_SECRET_KEY', { expiresIn: '1h' });
+
+  // Configura o cookie com o token
+  res.cookie('token', token, { httpOnly: true, secure: false }); // Altere secure para true em produção
+
+  console.log('Token configurado no cookie:', token); // Adicione um log para garantir que o token está sendo configurado
+
 };
 
+// Middleware para autenticar o usuário usando token JWT
 const autenticacao = (req, res, next) => {
+  const token = req.cookies.token;  // Verifique o cookie aqui, caso esteja usando cookie para armazenar o token
+
+  if (!token) {
+      return res.status(401).json({ message: "Token não fornecido" });
+  }
+
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ message: 'Token não fornecido' });
-    }
-
-    const token = authHeader.split(' ')[1];
-
-    if (!token) {
-      return res.status(401).json({ message: 'Token inválido' });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret');
-    req.user = decoded;
-
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Acesso negado' });
-    }
-
-    next();
+      const decoded = jwt.verify(token, 'SEU_SECRET_KEY'); // Substitua pelo seu segredo real
+      req.user = decoded;  // Armazena os dados do usuário no request
+      next();  // Passa para a próxima função
   } catch (error) {
-    console.error('Erro de autenticação:', error);
-    return res.status(401).json({ message: 'Autenticação falhou' });
+      return res.status(403).json({ message: "Token inválido" });
   }
 };
 
 
 
-module.exports = { autenticacao, login, authMiddleware, isAdmin, isUser };
+module.exports = { autenticacao, loginUser, authMiddleware, isAdmin, isUser };

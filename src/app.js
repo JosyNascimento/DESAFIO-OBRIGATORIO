@@ -16,8 +16,10 @@ const userRouter = require("./routes/user.router");
 const cartRouter = require("./routes/cart.router");
 const sessionRouter = require("./routes/session.router");
 const productRouter = require('./routes/product.router');
+const chatRoutes = require('./routes/chat.router'); 
 const session = require('express-session');
 const connectDB = require("./config/connectDB");
+
 connectDB();
 
 const app = express();
@@ -83,6 +85,8 @@ app.use("/carts", cartRouter);
 app.use("/products", productRouter);
 app.use('/', viewRouter);
 app.use('/', userRouter);
+app.use("/chat", chatRoutes);
+app.use("/api", productRouter);
 
 
 app.get("/", (req, res) => res.render("home", { title: "Página Inicial" }));
@@ -91,12 +95,10 @@ app.get("/list", (req, res) => res.render("list", { title: "List" }));
 app.get("/realtimeproducts", (req, res) => res.render("realTimeProducts", { title: "Produtos em Tempo Real" }));
 app.get("/chat", (req, res) => res.render("chat", { title: "Chat em Tempo Real" }));
 app.get('/perfil', (req, res) => {
-    if (req.isAuthenticated()) {
-        res.send('Página de perfil');
-    } else {
-        res.redirect('/login');
-    }
+    return res.send('Página de perfil');
 });
+
+
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));

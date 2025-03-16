@@ -5,11 +5,14 @@ const bcrypt = require('bcrypt');
 const userCollection = "users"; // Definindo o nome da coleção
 
 const userSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  email: { type: String, required: false }, // Agora opcional
+  first_name: { type: String, required: true },
+  last_name: { type: String, required: true },
+  username: { type: String, required: false },
+  email: { type: String, required: true}, 
   password: { type: String, required: false }, // Agora opcional
-  githubId: { type: String, unique: true }, // Armazena o ID do GitHub
-  profileUrl: String
+  githubId: { type: String, unique: true, required: false }, // Armazena o ID do GitHub
+  profileUrl: String,
+  
 });
 
 
@@ -38,6 +41,6 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
   }
 };
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model(userCollection, userSchema);
 
 module.exports = User;
