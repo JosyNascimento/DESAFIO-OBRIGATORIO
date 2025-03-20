@@ -2,7 +2,8 @@
 
 const User = require("../dao/models/user.model");
 const bcrypt = require("bcrypt");
-const passport = require("../config/passport.config.js");
+const passport = require("passport");
+require("../config/passport.config"); 
 const jwt = require("jsonwebtoken");
 
 // Renderiza a página de login
@@ -50,7 +51,7 @@ const login = (req, res, next) => {
     if (!user)
       return res.status(401).json({ message: "Usuário ou senha inválidos" });
 
-    req.logIn(user, (err) => {
+    req.login(user, (err) => {
       if (err) return next(err);
 
       // Gerar o token JWT
@@ -63,16 +64,7 @@ const login = (req, res, next) => {
       console.log("req.user após login:", req.user);
 
       res.cookie("token", token, { httpOnly: true, secure: false });
-      res.redirect("/perfil");
-      return res.json({
-        message: "Login bem-sucedido",
-        token,
-        user: {
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-        },
-      });
+      return res.redirect("/perfil");
     });
   })(req, res, next);
 };

@@ -1,10 +1,11 @@
 //src/config/passport.config.js
-require("dotenv").config(); // Coloque no topo sempre
+require("dotenv").config(); // Colocar no topo sempre
 const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy; // Corrigir o nome do LocalStrategy
+const LocalStrategy = require("passport-local").Strategy;
 const GitHubStrategy = require("passport-github2").Strategy;
 const bcrypt = require("bcrypt");
 const User = require("../dao/models/user.model");
+const { githubAuth } = require("../controllers/session.controller");
 
 // Função para buscar usuário por e-mail
 const findUserByEmail = async (email) => {
@@ -93,9 +94,7 @@ passport.use(
 );
 
 // Estratégia de Login com GitHub
-passport.use(
-  "github",
-  new GitHubStrategy(
+passport.use( "github",new GitHubStrategy(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
@@ -105,20 +104,14 @@ passport.use(
       console.log("AccessToken:", accessToken);
       console.log("refreshToken:", refreshToken);
       try {
-        console.log(profile);
-        if (profile._json && profile._json.name) {
-          let email = profile._json?.email
-            ? profile._json?.email
-            : `github-${profile.id}@noemail.com`;
-          let user = await User.findOne({ email });
+       
+          let user = await User.findOne({ email: profile._json.email });
           if (!user) {
-            const arrName = profile._json.name.split(" ");
-            console.log(arrName);
             let newUser = {
-              first_name: arrName[0],
-              last_name: arrName[1],
-              email,
+              age: profile._json.age ||18, 
+              email: profile._json.email,
               password: "",
+              githubid: profile.id,
             };
 
             let result = await User.create(newUser);
@@ -127,9 +120,7 @@ passport.use(
           } else {
             return done(null, user);
           }
-        } else {
-          return done("Erro: Dados do perfil do GitHub incompletos.");
-        }
+        
       } catch (error) {
         return done(`Erro ao autenticar usuário: ${error}`);
       }

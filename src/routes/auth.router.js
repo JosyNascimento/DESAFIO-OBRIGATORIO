@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/auth.controller");
-const passport = require('../config/passport.config.js');
+const passport = require('../config/passport.config');
 // Middleware para disponibilizar dados do usuário nas views
 router.use((req, res, next) => {
     if (req.session.user) {
@@ -11,6 +11,7 @@ router.use((req, res, next) => {
     next();
 });
 
+router.get('/githubcallback/success', authController.handleGithubCallback);
 // Autenticação com GitHub
 router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
 

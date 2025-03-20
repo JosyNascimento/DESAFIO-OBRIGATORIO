@@ -12,6 +12,8 @@ const {
 
 const router = express.Router();
 
+console.log("✅ session.router.js carregado!");
+
 router.use((req, res, next) => {
     if (req.session.user) {
         res.locals.user = req.session.user;
@@ -20,10 +22,13 @@ router.use((req, res, next) => {
 });
 
 router.get('/login', renderLoginPage);
-
+// Rota de login com GitHub
 router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
+console.log("Passport:", passport);
 
-router.get('/githubcallback', passport.authenticate('github', { failureRedirect: '/fail' }), (req, res) => {
+// Callback do GitHub
+router.get('/githubcallback', passport.authenticate('github', { 
+    failureRedirect: '/fail' }), (req, res) => {
     console.log("Dados de req.user do GitHub:", req.user); // Adicionado console.log aqui
     req.session.user = req.user; // Salva o usuário na sessão
     res.redirect('/perfil'); // Redireciona para a página de perfil

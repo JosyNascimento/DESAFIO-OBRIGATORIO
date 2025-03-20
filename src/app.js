@@ -15,6 +15,7 @@ const viewRouter = require("./routes/view.router");
 const userRouter = require("./routes/user.router");
 const cartRouter = require("./routes/cart.router");
 const sessionRouter = require("./routes/session.router");
+
 const productRouter = require('./routes/product.router');
 const chatRoutes = require('./routes/chat.router'); 
 const session = require('express-session');
@@ -42,11 +43,18 @@ io.on('connection', async (socket) => {
         console.log('Um cliente desconectou');
     });
 });
+console.log("Passport importado em app.js:", passport);
 
 console.log('GITHUB_CLIENT_ID:', process.env.GITHUB_CLIENT_ID);
 console.log('GITHUB_CLIENT_SECRET:', process.env.GITHUB_CLIENT_SECRET);
 
-app.engine("handlebars", handlebars.engine());
+app.engine("handlebars", handlebars.engine({
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+    }
+}));
+
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "views"));
 app.use(cookieParser());
@@ -79,8 +87,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Usar o roteador de autenticação
-app.use('/api/sessions', authRouter);
-app.use("/", sessionRouter);
+app.use('/', authRouter);
+app.use("/api/sessions", sessionRouter);
 app.use("/carts", cartRouter);
 app.use("/products", productRouter);
 app.use('/', viewRouter);
