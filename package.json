@@ -1,7 +1,7 @@
 {
-  "name": "desafio10",
+  "name": "desafio11",
   "version": "1.0.0",
-  "description": "desafio 10 Reestruturação do nosso servidor",
+  "description": "desafio 11 mocking e tratamento de erros",
   "main": "src/app.js",
   "scripts": {
     "dev": "nodemon app.js",
@@ -11,11 +11,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^9.7.0",
     "axios": "^1.8.3",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "connect-mongo": "^5.1.0",
-    
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.7",
     "express": "^4.18.2",
